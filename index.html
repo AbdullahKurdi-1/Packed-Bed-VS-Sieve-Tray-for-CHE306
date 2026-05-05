@@ -96,8 +96,9 @@ section{padding:5rem 1.5rem;}
 .ov-card .ov-label{font-size:0.8rem;color:var(--muted);margin-top:0.2rem;}
 
 /* ── COMPARE TABLE ── */
-.compare-wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.08);}
+.compare-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.08);}
 table{width:100%;border-collapse:collapse;background:var(--white);}
+.stage-wrap table{min-width:420px;}
 thead tr{background:var(--navy);}
 thead th{padding:1rem 1.2rem;color:var(--white);font-weight:700;font-size:0.85rem;text-align:left;}
 thead th.packed{color:#90CAF9;}
@@ -782,7 +783,7 @@ footer strong{color:var(--accent);}
       <div class="two-col">
         <div>
           <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">Packed Bed — Stage Profile</h3>
-          <div class="compare-wrap">
+          <div class="compare-wrap stage-wrap">
             <table>
               <thead>
                 <tr>
@@ -799,7 +800,7 @@ footer strong{color:var(--accent);}
         </div>
         <div>
           <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">Sieve Tray — Stage Profile</h3>
-          <div class="compare-wrap">
+          <div class="compare-wrap stage-wrap">
             <table>
               <thead>
                 <tr>
