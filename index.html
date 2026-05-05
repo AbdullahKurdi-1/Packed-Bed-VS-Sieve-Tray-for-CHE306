@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Packed Bed vs Sieve Tray Distillation – CHE 306</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#0a1628;
+  --blue:#1a3a6b;
+  --accent:#c8a84b;
+  --accent2:#4a90d9;
+  --packed:#2196F3;
+  --sieve:#FF6B35;
+  --light:#f4f7fc;
+  --white:#ffffff;
+  --text:#1a1a2e;
+  --muted:#5a6a80;
+  --card:#ffffff;
+  --border:#dce4f0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--text);line-height:1.6;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;width:100%;z-index:999;background:rgba(10,22,40,0.97);backdrop-filter:blur(8px);border-bottom:2px solid var(--accent);}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.5rem;}
+.nav-logo{color:var(--accent);font-weight:700;font-size:1rem;letter-spacing:1px;}
+.nav-links{display:flex;gap:1.5rem;list-style:none;}
+.nav-links a{color:#c8d8f0;text-decoration:none;font-size:0.82rem;transition:color 0.2s;}
+.nav-links a:hover{color:var(--accent);}
+
+/* ── HERO ── */
+.hero{min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,#0d2040 100%);display:flex;align-items:center;justify-content:center;text-align:center;padding:6rem 1.5rem 3rem;}
+.hero-badge{display:inline-block;background:rgba(200,168,75,0.15);border:1px solid var(--accent);color:var(--accent);font-size:0.78rem;letter-spacing:2px;padding:0.3rem 1rem;border-radius:20px;margin-bottom:1.5rem;text-transform:uppercase;}
+.hero h1{font-size:clamp(2rem,5vw,3.6rem);font-weight:800;color:var(--white);line-height:1.15;margin-bottom:1rem;}
+.hero h1 span{color:var(--accent);}
+.hero-sub{font-size:1.05rem;color:#a8c0e0;max-width:680px;margin:0 auto 2rem;}
+.hero-pills{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.pill{padding:0.5rem 1.2rem;border-radius:25px;font-size:0.85rem;font-weight:600;}
+.pill-packed{background:rgba(33,150,243,0.2);border:1px solid var(--packed);color:#90CAF9;}
+.pill-sieve{background:rgba(255,107,53,0.2);border:1px solid var(--sieve);color:#FFB99A;}
+.hero-scroll{margin-top:3rem;color:#6a90b8;font-size:0.8rem;animation:bounce 2s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* ── SECTIONS ── */
+section{padding:5rem 1.5rem;}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-tag{font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:0.5rem;}
+.section-title{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;color:var(--navy);margin-bottom:0.5rem;}
+.section-line{width:60px;height:3px;background:var(--accent);margin-bottom:2rem;border-radius:2px;}
+.section-desc{color:var(--muted);max-width:700px;margin-bottom:2.5rem;}
+
+/* ── OVERVIEW CARDS ── */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-top:2rem;}
+.ov-card{background:var(--white);border-radius:12px;padding:1.5rem;border-left:4px solid var(--accent2);box-shadow:0 2px 12px rgba(0,0,0,0.07);transition:transform 0.2s;}
+.ov-card:hover{transform:translateY(-4px);}
+.ov-card .ov-val{font-size:1.6rem;font-weight:800;color:var(--navy);}
+.ov-card .ov-label{font-size:0.8rem;color:var(--muted);margin-top:0.2rem;}
+
+/* ── COMPARE TABLE ── */
+.compare-wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.08);}
+table{width:100%;border-collapse:collapse;background:var(--white);}
+thead tr{background:var(--navy);}
+thead th{padding:1rem 1.2rem;color:var(--white);font-weight:700;font-size:0.85rem;text-align:left;}
+thead th.packed{color:#90CAF9;}
+thead th.sieve{color:#FFB99A;}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:hover{background:#f0f5ff;}
+tbody td{padding:0.85rem 1.2rem;font-size:0.88rem;color:var(--text);}
+tbody td:first-child{font-weight:600;color:var(--navy);background:#fafbff;}
+.badge-packed{display:inline-block;background:rgba(33,150,243,0.12);color:#1565C0;padding:0.15rem 0.6rem;border-radius:10px;font-size:0.78rem;font-weight:600;}
+.badge-sieve{display:inline-block;background:rgba(255,107,53,0.12);color:#bf360c;padding:0.15rem 0.6rem;border-radius:10px;font-size:0.78rem;font-weight:600;}
+
+/* ── TWO-COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+@media(max-width:768px){.two-col{grid-template-columns:1fr;}}
+
+/* ── STREAM CARDS ── */
+.stream-section{background:var(--navy);}
+.stream-section .section-title{color:var(--white);}
+.stream-section .section-tag{color:var(--accent);}
+.stream-section .section-desc{color:#a8c0e0;}
+.stream-tabs{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.tab-btn{padding:0.5rem 1.2rem;border-radius:8px;border:none;cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.2s;background:rgba(255,255,255,0.1);color:#a8c0e0;}
+.tab-btn.active{background:var(--accent);color:var(--navy);}
+.stream-panel{display:none;}
+.stream-panel.active{display:block;}
+.stream-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+@media(max-width:600px){.stream-grid{grid-template-columns:1fr;}}
+.stream-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem;}
+.stream-card h4{font-size:1rem;font-weight:700;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:2px solid;}
+.stream-card.packed-card h4{color:#90CAF9;border-color:var(--packed);}
+.stream-card.sieve-card h4{color:#FFB99A;border-color:var(--sieve);}
+.stream-row{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.stream-row:last-child{border-bottom:none;}
+.stream-row .prop{font-size:0.8rem;color:#8ab0d0;}
+.stream-row .val{font-size:0.85rem;font-weight:600;color:var(--white);}
+.comp-bar-wrap{margin-top:1rem;}
+.comp-bar-label{display:flex;justify-content:space-between;font-size:0.78rem;color:#8ab0d0;margin-bottom:0.25rem;}
+.comp-bar{height:8px;border-radius:4px;background:rgba(255,255,255,0.1);overflow:hidden;margin-bottom:0.6rem;}
+.comp-bar-fill{height:100%;border-radius:4px;transition:width 1s ease;}
+
+/* ── CHARTS ── */
+.chart-card{background:var(--white);border-radius:14px;padding:1.5rem;box-shadow:0 2px 16px rgba(0,0,0,0.08);}
+.chart-card h3{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;}
+.chart-wrap{position:relative;height:300px;}
+
+/* ── ENERGY ── */
+.energy-section{background:linear-gradient(135deg,#f0f5ff,var(--light));}
+.energy-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin-bottom:2.5rem;}
+.e-card{border-radius:14px;padding:1.8rem;color:var(--white);position:relative;overflow:hidden;}
+.e-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.08);}
+.e-card.packed-e{background:linear-gradient(135deg,#1565C0,var(--packed));}
+.e-card.sieve-e{background:linear-gradient(135deg,#bf360c,var(--sieve));}
+.e-card .e-type{font-size:0.75rem;letter-spacing:1px;opacity:0.8;text-transform:uppercase;margin-bottom:0.4rem;}
+.e-card .e-val{font-size:2rem;font-weight:800;}
+.e-card .e-unit{font-size:0.8rem;opacity:0.7;}
+.e-card .e-label{font-size:0.85rem;opacity:0.85;margin-top:0.3rem;}
+
+/* ── INTERNALS ── */
+.internals-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+@media(max-width:768px){.internals-grid{grid-template-columns:1fr;}}
+.int-card{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);}
+.int-header{padding:1rem 1.5rem;font-weight:700;font-size:1rem;color:var(--white);}
+.int-header.packed{background:linear-gradient(90deg,#1565C0,var(--packed));}
+.int-header.sieve{background:linear-gradient(90deg,#bf360c,var(--sieve));}
+.int-body{padding:1.2rem 1.5rem;}
+.int-row{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0;border-bottom:1px solid var(--border);}
+.int-row:last-child{border-bottom:none;}
+.int-row .key{font-size:0.82rem;color:var(--muted);}
+.int-row .val{font-size:0.85rem;font-weight:700;color:var(--navy);}
+
+/* ── SUMMARY ── */
+.summary-section{background:var(--navy);}
+.summary-section .section-title{color:var(--white);}
+.summary-section .section-tag{color:var(--accent);}
+.summary-section .section-desc{color:#a8c0e0;}
+.summary-section table{background:rgba(255,255,255,0.04);}
+.summary-section thead tr{background:rgba(200,168,75,0.2);}
+.summary-section thead th{color:var(--accent);}
+.summary-section thead th.packed{color:#90CAF9;}
+.summary-section thead th.sieve{color:#FFB99A;}
+.summary-section tbody tr{border-bottom:1px solid rgba(255,255,255,0.06);}
+.summary-section tbody tr:hover{background:rgba(255,255,255,0.05);}
+.summary-section tbody td{color:#d0e0f0;}
+.summary-section tbody td:first-child{color:var(--white);background:rgba(0,0,0,0.1);}
+.winner{font-size:0.72rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:8px;margin-left:0.4rem;}
+.win-packed{background:rgba(33,150,243,0.3);color:#90CAF9;}
+.win-sieve{background:rgba(255,107,53,0.3);color:#FFB99A;}
+
+/* ── CONTRIBUTORS ── */
+.contrib-section{background:linear-gradient(135deg,var(--light),#e8eef8);}
+.contrib-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;}
+.contrib-card{background:var(--white);border-radius:14px;padding:2rem 1.5rem;text-align:center;box-shadow:0 2px 16px rgba(0,0,0,0.08);transition:transform 0.2s,box-shadow 0.2s;}
+.contrib-card:hover{transform:translateY(-6px);box-shadow:0 8px 30px rgba(0,0,0,0.12);}
+.contrib-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent2));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.4rem;font-weight:800;color:var(--white);}
+.contrib-name{font-weight:700;font-size:0.95rem;color:var(--navy);margin-bottom:0.3rem;}
+.contrib-role{font-size:0.75rem;color:var(--muted);margin-bottom:1rem;}
+.linkedin-btn{display:inline-flex;align-items:center;gap:0.4rem;background:#0A66C2;color:var(--white);text-decoration:none;padding:0.4rem 1rem;border-radius:20px;font-size:0.78rem;font-weight:600;transition:background 0.2s;}
+.linkedin-btn:hover{background:#084d93;}
+.linkedin-icon{width:14px;height:14px;fill:var(--white);}
+
+/* ── FOOTER ── */
+footer{background:var(--navy);color:#5a7a9a;text-align:center;padding:2rem 1.5rem;border-top:2px solid var(--accent);font-size:0.82rem;}
+footer strong{color:var(--accent);}
+
+/* ── ANIMATIONS ── */
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+
+/* ── PROFILE BAR ── */
+.profile-bar{background:rgba(200,168,75,0.08);border:1px solid rgba(200,168,75,0.25);border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;}
+.profile-item{display:flex;flex-direction:column;}
+.profile-item .p-label{font-size:0.72rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.profile-item .p-val{font-size:0.88rem;font-weight:700;color:var(--navy);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">CHE 306 | Column Comparison</span>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#configuration">Config</a></li>
+      <li><a href="#streams">Streams</a></li>
+      <li><a href="#energy">Energy</a></li>
+      <li><a href="#profiles">Profiles</a></li>
+      <li><a href="#internals">Internals</a></li>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#contributors">Team</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div>
+    <div class="hero-badge">CHE 306 &mdash; Distillation Column Analysis</div>
+    <h1>Packed Bed<br/><span>vs</span><br/>Sieve Tray</h1>
+    <p class="hero-sub">A rigorous HYSYS simulation study comparing two industrial distillation configurations for the Ethanol–Water binary system using the NRTL–Ideal fluid package.</p>
+    <div class="hero-pills">
+      <span class="pill pill-packed">Packed Bed Column</span>
+      <span class="pill pill-sieve">Sieve Tray Column</span>
+    </div>
+    <div class="hero-scroll">▼ Scroll to explore</div>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section id="overview">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Simulation Summary</div>
+    <h2 class="section-title">At a Glance</h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Both columns were simulated in HYSYS with identical feed conditions (100 kgmole/h, 78°C, 101.3 kPa) and the same reflux ratio of 2.0, targeting an ethanol distillate purity of 90 mol%. The columns differ in their internal geometry, pressure drop behaviour, and sizing requirements.</p>
+
+    <div class="profile-bar">
+      <div class="profile-item"><span class="p-label">Software</span><span class="p-val">HYSYS</span></div>
+      <div class="profile-item"><span class="p-label">Fluid Package</span><span class="p-val">NRTL – Ideal</span></div>
+      <div class="profile-item"><span class="p-label">System</span><span class="p-val">Ethanol / Water</span></div>
+      <div class="profile-item"><span class="p-label">Feed Stages</span><span class="p-val">19 Stages (both)</span></div>
+      <div class="profile-item"><span class="p-label">Reflux Ratio</span><span class="p-val">2.0</span></div>
+      <div class="profile-item"><span class="p-label">Feed Stage</span><span class="p-val">Stage 17</span></div>
+    </div>
+
+    <div class="overview-grid">
+      <div class="ov-card">
+        <div class="ov-val">100.0</div>
+        <div class="ov-label">Feed Molar Flow (kgmole/h)</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-val">78.00 °C</div>
+        <div class="ov-label">Feed Temperature</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-val">40 mol%</div>
+        <div class="ov-label">Feed Ethanol Content</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-val">~83.4 mol%</div>
+        <div class="ov-label">Achieved Distillate Purity (both)</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-val">~9.5 mol%</div>
+        <div class="ov-label">Bottoms Ethanol (both)</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-val">2.0</div>
+        <div class="ov-label">Reflux Ratio (both)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIGURATION -->
+<section id="configuration" style="background:#fff;">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Column Setup</div>
+    <h2 class="section-title">Column Configuration</h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Both columns share the same number of equilibrium stages and feed location. Key differences emerge in pressure profiles, stream naming, and internal types.</p>
+    <div class="compare-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th class="packed">Packed Bed</th>
+            <th class="sieve">Sieve Tray</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Column ID</td><td>T-100</td><td>T-100</td></tr>
+          <tr><td>Sub-Flowsheet Tag</td><td>COL1</td><td>COL1</td></tr>
+          <tr><td>Fluid Package</td><td>NRTL – Ideal</td><td>NRTL – Ideal</td></tr>
+          <tr><td>Condenser Type</td><td>Total</td><td>Total</td></tr>
+          <tr><td>Number of Stages</td><td>19</td><td>19</td></tr>
+          <tr><td>Feed Stream Name</td><td>Stream 1</td><td>Feed</td></tr>
+          <tr><td>Feed Stage</td><td>Stage 17_Main Tower</td><td>Stage 17_Main Tower</td></tr>
+          <tr><td>P Condenser (kPa)</td><td>101.3</td><td>101.3</td></tr>
+          <tr><td>P Reboiler (kPa)</td><td><strong>103.0</strong></td><td><strong>101.3</strong></td></tr>
+          <tr><td>Condenser Energy Stream</td><td>Condenser</td><td>Q-condenser</td></tr>
+          <tr><td>Reboiler Energy Stream</td><td>Reboiler</td><td>Q-Reboiler</td></tr>
+          <tr><td>Distillate Stream</td><td>Distillate</td><td>DISTILLATE</td></tr>
+          <tr><td>Bottoms Stream</td><td>Bottom</td><td>BOTTOMS</td></tr>
+          <tr><td>Reflux Ratio</td><td>2.000</td><td>2.000</td></tr>
+          <tr><td>Distillate Rate Spec (kgmole/h)</td><td>41.20</td><td>41.20</td></tr>
+          <tr><td>Simulation Status</td><td><span class="badge-packed">Converged</span></td><td><span class="badge-sieve">Converged</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- STREAMS -->
+<section id="streams" class="stream-section">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Material Streams</div>
+    <h2 class="section-title">Stream Comparison</h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Select a stream below to compare conditions and compositions between both column configurations.</p>
+
+    <div class="stream-tabs">
+      <button class="tab-btn active" onclick="showStream('feed')">Feed</button>
+      <button class="tab-btn" onclick="showStream('dist')">Distillate</button>
+      <button class="tab-btn" onclick="showStream('bot')">Bottoms</button>
+    </div>
+
+    <!-- FEED -->
+    <div class="stream-panel active" id="panel-feed">
+      <div class="stream-grid">
+        <div class="stream-card packed-card">
+          <h4>Packed Bed — Feed (Stream 1)</h4>
+          <div class="stream-row"><span class="prop">Vapour Fraction</span><span class="val">0.0000</span></div>
+          <div class="stream-row"><span class="prop">Temperature</span><span class="val">78.00 °C</span></div>
+          <div class="stream-row"><span class="prop">Pressure</span><span class="val">101.3 kPa</span></div>
+          <div class="stream-row"><span class="prop">Molar Flow</span><span class="val">100.0 kgmole/h</span></div>
+          <div class="stream-row"><span class="prop">Mass Flow</span><span class="val">2924 kg/h</span></div>
+          <div class="stream-row"><span class="prop">Std Ideal Liq Vol Flow</span><span class="val">3.398 m³/h</span></div>
+          <div class="stream-row"><span class="prop">Molar Enthalpy</span><span class="val">−2.764×10⁵ kJ/kgmole</span></div>
+          <div class="stream-row"><span class="prop">Molar Entropy</span><span class="val">40.73 kJ/kgmole·°C</span></div>
+          <div class="stream-row"><span class="prop">Heat Flow</span><span class="val">−2.764×10⁷ kJ/h</span></div>
+          <div class="comp-bar-wrap">
+            <div class="comp-bar-label"><span>H₂O</span><span>0.6000</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:60%;background:#2196F3;"></div></div>
+            <div class="comp-bar-label"><span>Ethanol</span><span>0.4000</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:40%;background:#90CAF9;"></div></div>
+          </div>
+        </div>
+        <div class="stream-card sieve-card">
+          <h4>Sieve Tray — Feed</h4>
+          <div class="stream-row"><span class="prop">Vapour Fraction</span><span class="val">0.0000</span></div>
+          <div class="stream-row"><span class="prop">Temperature</span><span class="val">78.00 °C</span></div>
+          <div class="stream-row"><span class="prop">Pressure</span><span class="val">101.3 kPa</span></div>
+          <div class="stream-row"><span class="prop">Molar Flow</span><span class="val">100.0 kgmole/h</span></div>
+          <div class="stream-row"><span class="prop">Mass Flow</span><span class="val">2924 kg/h</span></div>
+          <div class="stream-row"><span class="prop">Std Ideal Liq Vol Flow</span><span class="val">3.398 m³/h</span></div>
+          <div class="stream-row"><span class="prop">Molar Enthalpy</span><span class="val">−2.764×10⁵ kJ/kgmole</span></div>
+          <div class="stream-row"><span class="prop">Molar Entropy</span><span class="val">40.73 kJ/kgmole·°C</span></div>
+          <div class="stream-row"><span class="prop">Heat Flow</span><span class="val">−2.764×10⁷ kJ/h</span></div>
+          <div class="comp-bar-wrap">
+            <div class="comp-bar-label"><span>H₂O</span><span>0.6000</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:60%;background:#FF6B35;"></div></div>
+            <div class="comp-bar-label"><span>Ethanol</span><span>0.4000</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:40%;background:#FFB99A;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISTILLATE -->
+    <div class="stream-panel" id="panel-dist">
+      <div class="stream-grid">
+        <div class="stream-card packed-card">
+          <h4>Packed Bed — Distillate</h4>
+          <div class="stream-row"><span class="prop">Vapour Fraction</span><span class="val">0.0000</span></div>
+          <div class="stream-row"><span class="prop">Temperature</span><span class="val">78.17 °C</span></div>
+          <div class="stream-row"><span class="prop">Pressure</span><span class="val">101.3 kPa</span></div>
+          <div class="stream-row"><span class="prop">Molar Flow</span><span class="val">41.22 kgmole/h</span></div>
+          <div class="stream-row"><span class="prop">Mass Flow</span><span class="val">1707 kg/h</span></div>
+          <div class="stream-row"><span class="prop">Std Ideal Liq Vol Flow</span><span class="val">2.113 m³/h</span></div>
+          <div class="stream-row"><span class="prop">Molar Enthalpy</span><span class="val">−2.716×10⁵ kJ/kgmole</span></div>
+          <div class="stream-row"><span class="prop">Molar Entropy</span><span class="val">56.51 kJ/kgmole·°C</span></div>
+          <div class="stream-row"><span class="prop">Heat Flow</span><span class="val">−1.120×10⁷ kJ/h</span></div>
+          <div class="comp-bar-wrap">
+            <div class="comp-bar-label"><span>H₂O</span><span>0.1659</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:16.59%;background:#2196F3;"></div></div>
+            <div class="comp-bar-label"><span>Ethanol</span><span>0.8341</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:83.41%;background:#90CAF9;"></div></div>
+          </div>
+        </div>
+        <div class="stream-card sieve-card">
+          <h4>Sieve Tray — DISTILLATE</h4>
+          <div class="stream-row"><span class="prop">Vapour Fraction</span><span class="val">0.0000</span></div>
+          <div class="stream-row"><span class="prop">Temperature</span><span class="val">78.17 °C</span></div>
+          <div class="stream-row"><span class="prop">Pressure</span><span class="val">101.3 kPa</span></div>
+          <div class="stream-row"><span class="prop">Molar Flow</span><span class="val">41.23 kgmole/h</span></div>
+          <div class="stream-row"><span class="prop">Mass Flow</span><span class="val">1708 kg/h</span></div>
+          <div class="stream-row"><span class="prop">Std Ideal Liq Vol Flow</span><span class="val">2.114 m³/h</span></div>
+          <div class="stream-row"><span class="prop">Molar Enthalpy</span><span class="val">−2.716×10⁵ kJ/kgmole</span></div>
+          <div class="stream-row"><span class="prop">Molar Entropy</span><span class="val">56.52 kJ/kgmole·°C</span></div>
+          <div class="stream-row"><span class="prop">Heat Flow</span><span class="val">−1.120×10⁷ kJ/h</span></div>
+          <div class="comp-bar-wrap">
+            <div class="comp-bar-label"><span>H₂O</span><span>0.1656</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:16.56%;background:#FF6B35;"></div></div>
+            <div class="comp-bar-label"><span>Ethanol</span><span>0.8344</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:83.44%;background:#FFB99A;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOMS -->
+    <div class="stream-panel" id="panel-bot">
+      <div class="stream-grid">
+        <div class="stream-card packed-card">
+          <h4>Packed Bed — Bottom</h4>
+          <div class="stream-row"><span class="prop">Vapour Fraction</span><span class="val">0.0000</span></div>
+          <div class="stream-row"><span class="prop">Temperature</span><span class="val">87.02 °C</span></div>
+          <div class="stream-row"><span class="prop">Pressure</span><span class="val">103.0 kPa</span></div>
+          <div class="stream-row"><span class="prop">Molar Flow</span><span class="val">58.78 kgmole/h</span></div>
+          <div class="stream-row"><span class="prop">Mass Flow</span><span class="val">1217 kg/h</span></div>
+          <div class="stream-row"><span class="prop">Std Ideal Liq Vol Flow</span><span class="val">1.285 m³/h</span></div>
+          <div class="stream-row"><span class="prop">Molar Enthalpy</span><span class="val">−2.791×10⁵ kJ/kgmole</span></div>
+          <div class="stream-row"><span class="prop">Molar Entropy</span><span class="val">27.87 kJ/kgmole·°C</span></div>
+          <div class="stream-row"><span class="prop">Heat Flow</span><span class="val">−1.640×10⁷ kJ/h</span></div>
+          <div class="comp-bar-wrap">
+            <div class="comp-bar-label"><span>H₂O</span><span>0.9044</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:90.44%;background:#2196F3;"></div></div>
+            <div class="comp-bar-label"><span>Ethanol</span><span>0.0956</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:9.56%;background:#90CAF9;"></div></div>
+          </div>
+        </div>
+        <div class="stream-card sieve-card">
+          <h4>Sieve Tray — BOTTOMS</h4>
+          <div class="stream-row"><span class="prop">Vapour Fraction</span><span class="val">0.0000</span></div>
+          <div class="stream-row"><span class="prop">Temperature</span><span class="val">86.62 °C</span></div>
+          <div class="stream-row"><span class="prop">Pressure</span><span class="val">101.3 kPa</span></div>
+          <div class="stream-row"><span class="prop">Molar Flow</span><span class="val">58.77 kgmole/h</span></div>
+          <div class="stream-row"><span class="prop">Mass Flow</span><span class="val">1216 kg/h</span></div>
+          <div class="stream-row"><span class="prop">Std Ideal Liq Vol Flow</span><span class="val">1.284 m³/h</span></div>
+          <div class="stream-row"><span class="prop">Molar Enthalpy</span><span class="val">−2.791×10⁵ kJ/kgmole</span></div>
+          <div class="stream-row"><span class="prop">Molar Entropy</span><span class="val">27.73 kJ/kgmole·°C</span></div>
+          <div class="stream-row"><span class="prop">Heat Flow</span><span class="val">−1.640×10⁷ kJ/h</span></div>
+          <div class="comp-bar-wrap">
+            <div class="comp-bar-label"><span>H₂O</span><span>0.9048</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:90.48%;background:#FF6B35;"></div></div>
+            <div class="comp-bar-label"><span>Ethanol</span><span>0.0952</span></div>
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:9.52%;background:#FFB99A;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENERGY -->
+<section id="energy" class="energy-section">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Thermal Duties</div>
+    <h2 class="section-title">Energy Comparison</h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Condenser and reboiler heat duties from the HYSYS energy stream outputs.</p>
+
+    <div class="energy-cards">
+      <div class="e-card packed-e">
+        <div class="e-type">Packed Bed — Condenser</div>
+        <div class="e-val">4.827 <span class="e-unit">×10⁶ kJ/h</span></div>
+        <div class="e-label">Heat removed by condenser</div>
+      </div>
+      <div class="e-card packed-e" style="background:linear-gradient(135deg,#0d47a1,#1976D2);">
+        <div class="e-type">Packed Bed — Reboiler</div>
+        <div class="e-val">4.881 <span class="e-unit">×10⁶ kJ/h</span></div>
+        <div class="e-label">Heat supplied to reboiler</div>
+      </div>
+      <div class="e-card sieve-e">
+        <div class="e-type">Sieve Tray — Q-condenser</div>
+        <div class="e-val">4.828 <span class="e-unit">×10⁶ kJ/h</span></div>
+        <div class="e-label">Heat removed by condenser</div>
+      </div>
+      <div class="e-card sieve-e" style="background:linear-gradient(135deg,#e64a19,#FF7043);">
+        <div class="e-type">Sieve Tray — Q-Reboiler</div>
+        <div class="e-val">4.873 <span class="e-unit">×10⁶ kJ/h</span></div>
+        <div class="e-label">Heat supplied to reboiler</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="chart-card">
+        <h3>Condenser vs Reboiler Duty (×10⁶ kJ/h)</h3>
+        <div class="chart-wrap">
+          <canvas id="energyChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Distillate Ethanol Purity Comparison (mol%)</h3>
+        <div class="chart-wrap">
+          <canvas id="purityChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE PROFILES -->
+<section id="profiles">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Stage-by-Stage Analysis</div>
+    <h2 class="section-title">Stage Profiles</h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Steady-state stage profiles from HYSYS Parameters tab. Stage 0 = Condenser; Stage 20 = Reboiler. Feed enters at Stage 17.</p>
+
+    <div class="two-col" style="margin-bottom:2rem;">
+      <div class="chart-card">
+        <h3>Temperature Profile (°C)</h3>
+        <div class="chart-wrap">
+          <canvas id="tempChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Pressure Profile (kPa)</h3>
+        <div class="chart-wrap">
+          <canvas id="pressChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="chart-card">
+        <h3>Net Liquid Flow Profile (kgmole/h)</h3>
+        <div class="chart-wrap">
+          <canvas id="liqChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Net Vapour Flow Profile (kgmole/h)</h3>
+        <div class="chart-wrap">
+          <canvas id="vapChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage profile tables -->
+    <div style="margin-top:2.5rem;">
+      <div class="two-col">
+        <div>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">Packed Bed — Stage Profile</h3>
+          <div class="compare-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Stage</th>
+                  <th class="packed">P (kPa)</th>
+                  <th class="packed">T (°C)</th>
+                  <th class="packed">Liq (kgmole/h)</th>
+                  <th class="packed">Vap (kgmole/h)</th>
+                </tr>
+              </thead>
+              <tbody id="packed-stage-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">Sieve Tray — Stage Profile</h3>
+          <div class="compare-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Stage</th>
+                  <th class="sieve">P (kPa)</th>
+                  <th class="sieve">T (°C)</th>
+                  <th class="sieve">Liq (kgmole/h)</th>
+                  <th class="sieve">Vap (kgmole/h)</th>
+                </tr>
+              </thead>
+              <tbody id="sieve-stage-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERNALS -->
+<section id="internals" style="background:#fff;">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Column Internals &amp; Sizing</div>
+    <h2 class="section-title">Internals &amp; Tower Sizing</h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Internal configuration from the HYSYS Internals tab and Rating &gt; Tower Sizing results. The packed bed uses PALL rings while the sieve tray uses perforated plates.</p>
+
+    <div class="internals-grid" style="margin-bottom:2rem;">
+      <div class="int-card">
+        <div class="int-header packed">Packed Bed — Internal CS-1</div>
+        <div class="int-body">
+          <div class="int-row"><span class="key">Section</span><span class="val">CS-1</span></div>
+          <div class="int-row"><span class="key">Start Stage</span><span class="val">1_Main Tower</span></div>
+          <div class="int-row"><span class="key">End Stage</span><span class="val">18_Main Tower</span></div>
+          <div class="int-row"><span class="key">Mode</span><span class="val">Interactive Sizing</span></div>
+          <div class="int-row"><span class="key">Internal Type</span><span class="val">Packed</span></div>
+          <div class="int-row"><span class="key">Packing Type</span><span class="val">PALL</span></div>
+          <div class="int-row"><span class="key">Packing Vendor</span><span class="val">GENERIC</span></div>
+          <div class="int-row"><span class="key">Packing Material</span><span class="val">Metal</span></div>
+          <div class="int-row"><span class="key">Packing Dimension</span><span class="val">2-IN / 50-MM</span></div>
+          <div class="int-row"><span class="key">Section Packed Height</span><span class="val" style="color:#1565C0;">11.58 m</span></div>
+          <div class="int-row"><span class="key">Column Diameter</span><span class="val" style="color:#1565C0;">1.000 m</span></div>
+          <div class="int-row"><span class="key">Liquid Residence Time</span><span class="val">60.00 s</span></div>
+        </div>
+      </div>
+      <div class="int-card">
+        <div class="int-header sieve">Sieve Tray — Internal CS-1</div>
+        <div class="int-body">
+          <div class="int-row"><span class="key">Section</span><span class="val">CS-1</span></div>
+          <div class="int-row"><span class="key">Start Stage</span><span class="val">1_Main Tower</span></div>
+          <div class="int-row"><span class="key">End Stage</span><span class="val">19_Main Tower</span></div>
+          <div class="int-row"><span class="key">Mode</span><span class="val">Interactive Sizing</span></div>
+          <div class="int-row"><span class="key">Internal Type</span><span class="val">Trayed</span></div>
+          <div class="int-row"><span class="key">Tray Type</span><span class="val">Sieve</span></div>
+          <div class="int-row"><span class="key">Number of Passes</span><span class="val">1</span></div>
+          <div class="int-row"><span class="key">Number of Downcomers</span><span class="val">—</span></div>
+          <div class="int-row"><span class="key">Tray Spacing</span><span class="val" style="color:#bf360c;">0.6096 m</span></div>
+          <div class="int-row"><span class="key">Column Diameter</span><span class="val" style="color:#bf360c;">0.8056 m</span></div>
+          <div class="int-row"><span class="key">Liquid Residence Time</span><span class="val">60.00 s</span></div>
+          <div class="int-row"><span class="key">Status</span><span class="val" style="color:#c62828;font-size:0.78rem;">Errors – see hydraulic plot</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">Rating — Tower Sizing</h3>
+    <div class="internals-grid">
+      <div class="int-card">
+        <div class="int-header packed">Packed Bed — Tower Sizing</div>
+        <div class="int-body">
+          <div class="int-row"><span class="key">Tower</span><span class="val">Main Tower</span></div>
+          <div class="int-row"><span class="key">Internal Type</span><span class="val">Sieve (reference)</span></div>
+          <div class="int-row"><span class="key">Diameter</span><span class="val">1.000 m</span></div>
+          <div class="int-row"><span class="key">Tray/Packed Space</span><span class="val">0.5500 m</span></div>
+          <div class="int-row"><span class="key">Tray/Packed Volume</span><span class="val">0.4320 m³</span></div>
+          <div class="int-row"><span class="key">Hold Up</span><span class="val">3.927×10⁻² m³</span></div>
+          <div class="int-row"><span class="key">Weeping Factor</span><span class="val">1.000</span></div>
+          <div class="int-row"><span class="key">Tray Sizing for Costing</span><span class="val">Internals-1@Main</span></div>
+        </div>
+      </div>
+      <div class="int-card">
+        <div class="int-header sieve">Sieve Tray — Tower Sizing</div>
+        <div class="int-body">
+          <div class="int-row"><span class="key">Tower</span><span class="val">Main Tower</span></div>
+          <div class="int-row"><span class="key">Internal Type</span><span class="val">Sieve</span></div>
+          <div class="int-row"><span class="key">Diameter</span><span class="val" style="color:#bf360c;">1.500 m</span></div>
+          <div class="int-row"><span class="key">Tray/Packed Space</span><span class="val">0.5500 m</span></div>
+          <div class="int-row"><span class="key">Tray/Packed Volume</span><span class="val">0.9719 m³</span></div>
+          <div class="int-row"><span class="key">Hold Up</span><span class="val">8.836×10⁻² m³</span></div>
+          <div class="int-row"><span class="key">Weeping Factor</span><span class="val">1.000</span></div>
+          <div class="int-row"><span class="key">Tray Sizing for Costing</span><span class="val">Internals-1@Main</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section id="summary" class="summary-section">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Full Comparison</div>
+    <h2 class="section-title">Summary Table</h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Complete side-by-side comparison of all key simulation results extracted from HYSYS.</p>
+    <div class="compare-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th class="packed">Packed Bed</th>
+            <th class="sieve">Sieve Tray</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">COLUMN CONFIGURATION</td></tr>
+          <tr><td>Number of Stages</td><td>19</td><td>19</td></tr>
+          <tr><td>Feed Stage</td><td>Stage 17</td><td>Stage 17</td></tr>
+          <tr><td>Condenser Type</td><td>Total</td><td>Total</td></tr>
+          <tr><td>P Condenser (kPa)</td><td>101.3</td><td>101.3</td></tr>
+          <tr><td>P Reboiler (kPa)</td><td>103.0</td><td>101.3</td></tr>
+          <tr><td>Column Pressure Drop (kPa)</td><td>1.7</td><td>0.0</td></tr>
+
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">FEED STREAM</td></tr>
+          <tr><td>Feed Temperature (°C)</td><td>78.00</td><td>78.00</td></tr>
+          <tr><td>Feed Pressure (kPa)</td><td>101.3</td><td>101.3</td></tr>
+          <tr><td>Feed Molar Flow (kgmole/h)</td><td>100.0</td><td>100.0</td></tr>
+          <tr><td>Feed H₂O Mole Fraction</td><td>0.6000</td><td>0.6000</td></tr>
+          <tr><td>Feed Ethanol Mole Fraction</td><td>0.4000</td><td>0.4000</td></tr>
+
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">DISTILLATE STREAM</td></tr>
+          <tr><td>Temperature (°C)</td><td>78.17</td><td>78.17</td></tr>
+          <tr><td>Molar Flow (kgmole/h)</td><td>41.22</td><td>41.23</td></tr>
+          <tr><td>Mass Flow (kg/h)</td><td>1707</td><td>1708</td></tr>
+          <tr><td>Ethanol Purity (mol frac)</td><td>0.8341</td><td>0.8344</td></tr>
+          <tr><td>H₂O Mol Fraction</td><td>0.1659</td><td>0.1656</td></tr>
+          <tr><td>Molar Enthalpy (kJ/kgmole)</td><td>−2.716×10⁵</td><td>−2.716×10⁵</td></tr>
+
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">BOTTOMS STREAM</td></tr>
+          <tr><td>Temperature (°C)</td><td>87.02</td><td>86.62</td></tr>
+          <tr><td>Pressure (kPa)</td><td>103.0</td><td>101.3</td></tr>
+          <tr><td>Molar Flow (kgmole/h)</td><td>58.78</td><td>58.77</td></tr>
+          <tr><td>H₂O Mol Fraction</td><td>0.9044</td><td>0.9048</td></tr>
+          <tr><td>Ethanol Mol Fraction</td><td>0.0956</td><td>0.0952</td></tr>
+          <tr><td>Molar Enthalpy (kJ/kgmole)</td><td>−2.791×10⁵</td><td>−2.791×10⁵</td></tr>
+
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">ENERGY DUTIES</td></tr>
+          <tr><td>Condenser Duty (kJ/h)</td><td>4.827×10⁶</td><td>4.828×10⁶</td></tr>
+          <tr><td>Reboiler Duty (kJ/h)</td><td>4.881×10⁶ <span class="winner win-sieve">Higher</span></td><td>4.873×10⁶ <span class="winner win-packed">Lower</span></td></tr>
+          <tr><td>Net Energy Difference (%)</td><td colspan="2">Reboiler: 0.16% difference</td></tr>
+
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">COLUMN INTERNALS</td></tr>
+          <tr><td>Internal Type</td><td>Packed (PALL rings)</td><td>Trayed (Sieve)</td></tr>
+          <tr><td>Packing / Tray Dimension</td><td>50 mm / 2-in metal PALL</td><td>Sieve, 1 pass</td></tr>
+          <tr><td>Active Stages in Section</td><td>1–18</td><td>1–19</td></tr>
+          <tr><td>Tray Spacing / Packed Height</td><td>11.58 m (packed height)</td><td>0.6096 m (tray spacing)</td></tr>
+          <tr><td>Internal Diameter (m)</td><td>1.000 <span class="winner win-packed">Smaller</span></td><td>0.8056 (internals) / 1.500 (rating)</td></tr>
+
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">TOWER SIZING</td></tr>
+          <tr><td>Rating Diameter (m)</td><td>1.000 <span class="winner win-packed">Smaller</span></td><td>1.500 <span class="winner win-sieve">Larger</span></td></tr>
+          <tr><td>Packed/Tray Volume (m³)</td><td>0.4320 <span class="winner win-packed">Smaller</span></td><td>0.9719 <span class="winner win-sieve">Larger</span></td></tr>
+          <tr><td>Hold Up (m³)</td><td>3.927×10⁻²</td><td>8.836×10⁻²</td></tr>
+          <tr><td>Weeping Factor</td><td>1.000</td><td>1.000</td></tr>
+
+          <tr><td colspan="3" style="background:rgba(200,168,75,0.1);color:#c8a84b;font-weight:700;font-size:0.78rem;letter-spacing:1px;padding:0.6rem 1.2rem;">SIMULATION STATUS</td></tr>
+          <tr><td>Convergence</td><td>Converged</td><td>Converged</td></tr>
+          <tr><td>Internals Status</td><td>Warning (column gaps)</td><td>Error (hydraulic plot)</td></tr>
+          <tr><td>Comp Fraction Spec Met</td><td>0.8341 vs 0.9000 target</td><td>0.8344 vs 0.9000 target</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRIBUTORS -->
+<section id="contributors" class="contrib-section">
+  <div class="section-inner fade-in">
+    <div class="section-tag">Research Team</div>
+    <h2 class="section-title">Contributors</h2>
+    <div class="section-line"></div>
+    <p class="section-desc" style="margin-bottom:2.5rem;">This study was conducted as part of CHE 306 at King Fahd University of Petroleum &amp; Minerals.</p>
+    <div class="contrib-grid">
+
+      <div class="contrib-card">
+        <div class="contrib-avatar">AK</div>
+        <div class="contrib-name">Abdullah Kurdi</div>
+        <div class="contrib-role">CHE 306 — Chemical Engineering</div>
+        <a class="linkedin-btn" href="https://www.linkedin.com/in/abdullah-kurdi-31a89a3a6?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener">
+          <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+      <div class="contrib-card">
+        <div class="contrib-avatar">RA</div>
+        <div class="contrib-name">Reda Alramdhan</div>
+        <div class="contrib-role">CHE 306 — Chemical Engineering</div>
+        <a class="linkedin-btn" href="https://www.linkedin.com/in/reda-alramdhan-2174b9270?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener">
+          <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+      <div class="contrib-card">
+        <div class="contrib-avatar">MA</div>
+        <div class="contrib-name">Mohammed Alsalem</div>
+        <div class="contrib-role">CHE 306 — Chemical Engineering</div>
+        <a class="linkedin-btn" href="https://www.linkedin.com/in/mohammed-alsalem-3575683a4?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener">
+          <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+      <div class="contrib-card">
+        <div class="contrib-avatar">RS</div>
+        <div class="contrib-name">Ridha Alsalem</div>
+        <div class="contrib-role">CHE 306 — Chemical Engineering</div>
+        <a class="linkedin-btn" href="https://www.linkedin.com/in/ridha-alsalem-53258b396?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener">
+          <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+      <div class="contrib-card">
+        <div class="contrib-avatar">SA</div>
+        <div class="contrib-name">Saud Alotaibi</div>
+        <div class="contrib-role">CHE 306 — Chemical Engineering</div>
+        <a class="linkedin-btn" href="https://www.linkedin.com/in/saud-al-otaibi-5663b82a3?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener">
+          <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>CHE 306 — Packed Bed vs Sieve Tray Distillation</strong><br/>
+  HYSYS Simulation | NRTL–Ideal | Ethanol–Water System<br/>
+  King Fahd University of Petroleum &amp; Minerals
+</footer>
+
+<script>
+// ── STAGE DATA ──
+const stages = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+const stageLabels = ['Cond','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','Reb'];
+
+const packedData = [
+  {s:0,  name:'Condenser',   p:101.3, t:78.17, l:82.44,  v:0},
+  {s:1,  name:'1_Main',      p:101.3, t:78.21, l:82.34,  v:123.7},
+  {s:2,  name:'2_Main',      p:101.4, t:78.26, l:82.26,  v:123.6},
+  {s:3,  name:'3_Main',      p:101.5, t:78.32, l:82.19,  v:123.5},
+  {s:4,  name:'4_Main',      p:101.6, t:78.38, l:82.12,  v:123.4},
+  {s:5,  name:'5_Main',      p:101.7, t:78.44, l:82.05,  v:123.3},
+  {s:6,  name:'6_Main',      p:101.8, t:78.51, l:81.97,  v:123.3},
+  {s:7,  name:'7_Main',      p:101.9, t:78.57, l:81.91,  v:123.2},
+  {s:8,  name:'8_Main',      p:102.0, t:78.64, l:81.83,  v:123.1},
+  {s:9,  name:'9_Main',      p:102.1, t:78.71, l:81.75,  v:123.1},
+  {s:10, name:'10_Main',     p:102.2, t:78.80, l:81.67,  v:123.0},
+  {s:11, name:'11_Main',     p:102.3, t:78.89, l:81.57,  v:122.9},
+  {s:12, name:'12_Main',     p:102.3, t:79.00, l:81.45,  v:122.8},
+  {s:13, name:'13_Main',     p:102.4, t:79.13, l:81.31,  v:122.7},
+  {s:14, name:'14_Main',     p:102.5, t:79.29, l:81.13,  v:122.5},
+  {s:15, name:'15_Main',     p:102.6, t:79.52, l:80.89,  v:122.4},
+  {s:16, name:'16_Main',     p:102.7, t:79.87, l:80.54,  v:122.1},
+  {s:17, name:'17_Main',     p:102.8, t:80.47, l:181.3,  v:121.8},
+  {s:18, name:'18_Main',     p:102.9, t:80.69, l:180.0,  v:122.6},
+  {s:19, name:'19_Main',     p:103.0, t:81.62, l:179.1,  v:122.2},
+  {s:20, name:'Reboiler',    p:103.0, t:87.02, l:58.78,  v:120.3},
+];
+
+const sieveData = [
+  {s:0,  name:'Condenser',   p:101.3, t:78.17, l:82.46,  v:0},
+  {s:1,  name:'1_Main',      p:101.3, t:78.21, l:82.36,  v:123.7},
+  {s:2,  name:'2_Main',      p:101.3, t:78.24, l:82.28,  v:123.6},
+  {s:3,  name:'3_Main',      p:101.3, t:78.28, l:82.20,  v:123.5},
+  {s:4,  name:'4_Main',      p:101.3, t:78.31, l:82.12,  v:123.4},
+  {s:5,  name:'5_Main',      p:101.3, t:78.35, l:82.05,  v:123.3},
+  {s:6,  name:'6_Main',      p:101.3, t:78.39, l:81.97,  v:123.3},
+  {s:7,  name:'7_Main',      p:101.3, t:78.43, l:81.90,  v:123.2},
+  {s:8,  name:'8_Main',      p:101.3, t:78.48, l:81.82,  v:123.1},
+  {s:9,  name:'9_Main',      p:101.3, t:78.53, l:81.73,  v:123.1},
+  {s:10, name:'10_Main',     p:101.3, t:78.59, l:81.64,  v:123.0},
+  {s:11, name:'11_Main',     p:101.3, t:78.66, l:81.54,  v:122.9},
+  {s:12, name:'12_Main',     p:101.3, t:78.74, l:81.42,  v:122.8},
+  {s:13, name:'13_Main',     p:101.3, t:78.85, l:81.28,  v:122.6},
+  {s:14, name:'14_Main',     p:101.3, t:78.99, l:81.09,  v:122.5},
+  {s:15, name:'15_Main',     p:101.3, t:79.20, l:80.85,  v:122.3},
+  {s:16, name:'16_Main',     p:101.3, t:79.52, l:80.49,  v:122.1},
+  {s:17, name:'17_Main',     p:101.3, t:80.10, l:181.2,  v:121.7},
+  {s:18, name:'18_Main',     p:101.3, t:80.30, l:180.7,  v:122.4},
+  {s:19, name:'19_Main',     p:101.3, t:81.23, l:178.8,  v:122.0},
+  {s:20, name:'Reboiler',    p:101.3, t:86.62, l:58.77,  v:120.0},
+];
+
+// ── CHART DEFAULTS ──
+const baseOpts = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#1a1a2e',font:{size:11}}}},
+  scales:{
+    x:{ticks:{color:'#5a6a80',font:{size:10}},grid:{color:'rgba(0,0,0,0.06)'}},
+    y:{ticks:{color:'#5a6a80',font:{size:10}},grid:{color:'rgba(0,0,0,0.06)'}}
+  }
+};
+const lineDs = (label,data,color,dash=[])=>({
+  label,data,borderColor:color,backgroundColor:color+'22',
+  borderWidth:2,pointRadius:3,pointHoverRadius:5,fill:false,
+  borderDash:dash,tension:0.3
+});
+
+// Temperature
+new Chart(document.getElementById('tempChart'),{
+  type:'line',
+  data:{labels:stageLabels,datasets:[
+    lineDs('Packed Bed',packedData.map(d=>d.t),'#2196F3'),
+    lineDs('Sieve Tray',sieveData.map(d=>d.t),'#FF6B35',[5,3])
+  ]},
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,title:{display:true,text:'Temperature (°C)',color:'#5a6a80'}}}}
+});
+
+// Pressure
+new Chart(document.getElementById('pressChart'),{
+  type:'line',
+  data:{labels:stageLabels,datasets:[
+    lineDs('Packed Bed',packedData.map(d=>d.p),'#2196F3'),
+    lineDs('Sieve Tray',sieveData.map(d=>d.p),'#FF6B35',[5,3])
+  ]},
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,title:{display:true,text:'Pressure (kPa)',color:'#5a6a80'}}}}
+});
+
+// Liquid
+new Chart(document.getElementById('liqChart'),{
+  type:'line',
+  data:{labels:stageLabels,datasets:[
+    lineDs('Packed Bed',packedData.map(d=>d.l),'#2196F3'),
+    lineDs('Sieve Tray',sieveData.map(d=>d.l),'#FF6B35',[5,3])
+  ]},
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,title:{display:true,text:'Liquid Flow (kgmole/h)',color:'#5a6a80'}}}}
+});
+
+// Vapour (skip condenser zero)
+new Chart(document.getElementById('vapChart'),{
+  type:'line',
+  data:{labels:stageLabels.slice(1),datasets:[
+    lineDs('Packed Bed',packedData.slice(1).map(d=>d.v),'#2196F3'),
+    lineDs('Sieve Tray',sieveData.slice(1).map(d=>d.v),'#FF6B35',[5,3])
+  ]},
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,title:{display:true,text:'Vapour Flow (kgmole/h)',color:'#5a6a80'}}}}
+});
+
+// Energy bar chart
+new Chart(document.getElementById('energyChart'),{
+  type:'bar',
+  data:{
+    labels:['Condenser','Reboiler'],
+    datasets:[
+      {label:'Packed Bed',data:[4.827,4.881],backgroundColor:'#2196F3',borderRadius:6},
+      {label:'Sieve Tray',data:[4.828,4.873],backgroundColor:'#FF6B35',borderRadius:6}
+    ]
+  },
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,title:{display:true,text:'Heat Duty (×10⁶ kJ/h)',color:'#5a6a80'}}}}
+});
+
+// Purity doughnut
+new Chart(document.getElementById('purityChart'),{
+  type:'bar',
+  data:{
+    labels:['Packed Bed Distillate','Sieve Tray Distillate'],
+    datasets:[
+      {label:'Ethanol',data:[83.41,83.44],backgroundColor:['#2196F3','#FF6B35'],borderRadius:8},
+      {label:'Water',data:[16.59,16.56],backgroundColor:['#90CAF9','#FFB99A'],borderRadius:8}
+    ]
+  },
+  options:{
+    ...baseOpts,
+    scales:{
+      x:{stacked:true,ticks:{color:'#5a6a80'},grid:{color:'rgba(0,0,0,0.06)'}},
+      y:{stacked:true,max:100,ticks:{color:'#5a6a80'},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Mol %',color:'#5a6a80'}}
+    }
+  }
+});
+
+// ── POPULATE STAGE TABLES ──
+function populateTbody(id,data){
+  const tb=document.getElementById(id);
+  data.forEach(d=>{
+    const tr=document.createElement('tr');
+    const vDisp=d.s===0?'≈0':d.v.toFixed(1);
+    tr.innerHTML=`<td>${d.s===0?'Cond':d.s===20?'Reb':d.s}</td><td>${d.p}</td><td>${d.t}</td><td>${d.l}</td><td>${vDisp}</td>`;
+    tb.appendChild(tr);
+  });
+}
+populateTbody('packed-stage-tbody',packedData);
+populateTbody('sieve-stage-tbody',sieveData);
+
+// ── STREAM TABS ──
+function showStream(id){
+  document.querySelectorAll('.stream-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── SCROLL ANIMATIONS ──
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
