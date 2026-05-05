@@ -156,9 +156,12 @@ tbody td:first-child{font-weight:600;color:var(--navy);background:#fafbff;}
 .contrib-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;}
 .contrib-card{background:var(--white);border-radius:14px;padding:2rem 1.5rem;text-align:center;box-shadow:0 2px 16px rgba(0,0,0,0.08);transition:transform 0.2s,box-shadow 0.2s;}
 .contrib-card:hover{transform:translateY(-6px);box-shadow:0 8px 30px rgba(0,0,0,0.12);}
+.contrib-card.supervisor{border-top:3px solid var(--accent);background:linear-gradient(160deg,#fffdf5,#fff);}
 .contrib-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent2));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.4rem;font-weight:800;color:var(--white);}
+.contrib-avatar.supervisor-av{background:linear-gradient(135deg,var(--navy),var(--accent));width:72px;height:72px;font-size:1.5rem;}
 .contrib-name{font-weight:700;font-size:0.95rem;color:var(--navy);margin-bottom:0.3rem;}
 .contrib-role{font-size:0.75rem;color:var(--muted);margin-bottom:1rem;}
+.supervisor-badge{display:inline-block;background:rgba(200,168,75,0.15);border:1px solid var(--accent);color:#8a6a00;font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:0.2rem 0.7rem;border-radius:10px;margin-bottom:0.8rem;}
 .linkedin-btn{display:inline-flex;align-items:center;gap:0.4rem;background:#0A66C2;color:var(--white);text-decoration:none;padding:0.4rem 1rem;border-radius:20px;font-size:0.78rem;font-weight:600;transition:background 0.2s;}
 .linkedin-btn:hover{background:#084d93;}
 .linkedin-icon{width:14px;height:14px;fill:var(--white);}
@@ -725,6 +728,16 @@ footer strong{color:var(--accent);}
     <h2 class="section-title">Contributors</h2>
     <div class="section-line"></div>
     <p class="section-desc" style="margin-bottom:2.5rem;">This study was conducted as part of CHE 306 at King Fahd University of Petroleum &amp; Minerals.</p>
+    <!-- Supervisor -->
+    <div style="margin-bottom:2rem;">
+      <div class="contrib-card supervisor" style="max-width:320px;margin:0 auto;text-align:center;">
+        <div class="contrib-avatar supervisor-av" style="margin:0 auto 1rem;">BA</div>
+        <div class="supervisor-badge">Supervisor</div>
+        <div class="contrib-name" style="font-size:1.05rem;">Dr. Basim Abussaud</div>
+        <div class="contrib-role">CHE 306 — Chemical Engineering<br/>King Fahd University of Petroleum &amp; Minerals</div>
+      </div>
+    </div>
+
     <div class="contrib-grid">
 
       <div class="contrib-card">
